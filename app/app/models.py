@@ -16,6 +16,9 @@ class Street(models.Model):
     name = models.CharField(max_length=30, null=False)
     city_id = models.ForeignKey('City', on_delete=models.CASCADE)
 
+    class Meta:
+        unique_together = ['name', 'city_id']
+
     def get_absolute_url(self):
         return reverse('model-detail-view', args=[str(self.id)])
 
