@@ -41,12 +41,13 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins
         is_open = request.GET.get('open', None)
 
         if city_name is not None:
-            city_id = [models.City.objects.get(name=city_name).id]
+            city_id = models.City.objects.filter(name=city_name).values_list('id')
+            if not len(city_id):
+                return JsonResponse({}, status=200)
 
         if street_name is None:
             if city_name is not None:
                 street_id = models.Street.objects.filter(city_id__in=city_id).values_list('id')
-                street_id = [i[0] for i in street_id]
         else:
             if city_name is None:
                 street_id = models.Street.objects.filter(name=street_name).values_list('id')
@@ -56,6 +57,8 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins
         if (city_name is None) and (street_name is None):
             shops = models.Shop.objects.all()
         else:
+            if not len(street_id):
+                return JsonResponse({}, status=200)
             shops = models.Shop.objects.all().filter(street_id__in=street_id)
 
         if is_open is not None:
@@ -80,7 +83,7 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins
             return JsonResponse({str(e): ["This field is required."]}, status=400)
 
         city, city_created = models.City.objects.get_or_create(name=city_name)
-        street, street_created = models.Street.objects.get_or_create(name=street_name, city_id=city.id)
+        street, street_created = models.Street.objects.get_or_create(name=street_name, city_id=city)
 
         try:
             shop = models.Shop.objects.create(name=shop_name, open_time=open_time,
@@ -98,17 +101,17 @@ class ShopViewSet(viewsets.ReadOnlyModelViewSet, mixins.CreateModelMixin, mixins
     def destroy(self, request, *args, **kwargs):
         try:
             shop = models.Shop.objects.get(id=kwargs['pk'])
-            street_id = shop.street_id
+            street_id = shop.street_id.id
             shop.delete()
         except models.Shop.DoesNotExist:
             return JsonResponse({}, status=404)
 
         if not models.Shop.objects.filter(street_id=street_id).exists():
             street = models.Street.objects.get(id=street_id)
-            city_id = street.city_id
+            city_id = street.city_id.id
             street.delete()
 
-            if not models.Street.objects.get(city_id=city_id).exists():
+            if not models.Street.objects.filter(city_id=city_id).exists():
                 models.City.objects.get(id=city_id).delete()
 
         return JsonResponse({}, status=204)
