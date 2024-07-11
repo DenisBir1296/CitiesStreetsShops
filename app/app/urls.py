@@ -28,7 +28,6 @@ router.register(r'shop', views.ShopViewSet)
 
 
 urlpatterns = [
-    path('data/', csrf_exempt(views.data)),
     path('admin/', admin.site.urls),
 ]
 

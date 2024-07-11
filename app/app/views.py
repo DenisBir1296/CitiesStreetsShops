@@ -12,13 +12,6 @@ from . import models
 from . import serializers
 
 
-def data(request):
-    if request.method == 'POST':
-        req = request.body
-        print('Результат : ', json.loads(req)['number'])
-        return HttpResponse('ok')
-    return HttpResponse('error')
-
 
 class CityViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.City.objects.all()
