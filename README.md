@@ -1,3 +1,5 @@
+## Задание
+https://drive.google.com/file/d/1nTTSmdbbJPnTCC3_Pi0oeIc5oFXFW0K2/view
 ## API
 + GET city/ - получить список городов и информацию о них;
 + GET city/id - получить инфомацию о городе по id;
