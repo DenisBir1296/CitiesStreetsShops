@@ -7,6 +7,6 @@
 + POST shop/ - добавить город;
 + DELETE shop/id - удалить город по id;
 ## Запуск
-python manager.py runserver ( как по-нормальному запускать еще не разобрался).
+перейти в директорию app и выполнить gunicorn app.wsgi:application.
 Доступ к панели администратора: root 1234. В качестве базы данных sqlite.
   
